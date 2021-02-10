@@ -12,6 +12,10 @@ python -m pip install -r requirements.txt
 ```
 Because the database used for this application is needed please follow the setup guide for the [ETL_data_reader package](https://github.com/CaptainDario/ETL_data_reader).
 
+## Kanji recognition CNN
+This CNN tries to recognize Kanji characters.
+A list of all supported characters can be found [here](./CNN_kanji_only/labels_CNN_kanji_only.txt) and an application using it [here](https://github.com/CaptainDario/DaKanjiRecognizer-Desktop). 
+
 ## Credits
 * [pages: button design](https://dribbble.com/shots/2544738-Not-your-average-button)
 ### CNN for kanji detection

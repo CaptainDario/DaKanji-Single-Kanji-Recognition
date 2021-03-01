@@ -1,3 +1,6 @@
 dataset
 .history
 .venv
+**.hdf5
+**checkpoint.ipynb
+.vscode

@@ -3,4 +3,9 @@ dataset
 .venv
 **.hdf5
 **checkpoint.ipynb
+
+# ignore vs code files
 .vscode
+
+# exclude release folder
+releases/

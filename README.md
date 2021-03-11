@@ -1,5 +1,5 @@
 # DaKanjiRecognizer-ML
-The machine learning parts of the DaKanjiRecognizer applications(s).
+The machine learning parts of the DaKanjiRecognizer applications.
 
 
 ## Setup development environment

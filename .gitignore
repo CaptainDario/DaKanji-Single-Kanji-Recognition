@@ -9,3 +9,6 @@ dataset
 
 # exclude release folder
 releases/
+
+# exclude tensorboard logs
+**/tensorboard_logs/**

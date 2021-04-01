@@ -17,4 +17,5 @@ releases/
 
 # ignore the models
 **.hdf5
-**\model
+**/model
+/retinanet_kuzushiji/models/**

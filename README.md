@@ -1,5 +1,5 @@
 # DaKanjiRecognizer-ML
-The machine learning parts of the DaKanjiRecognizer applications.
+The machine learning parts of the DaKanji applications.
 
 
 ## Setup development environment
@@ -14,7 +14,7 @@ Because the database used for this application is needed please follow the setup
 
 ## Kanji recognition CNN
 This CNN tries to recognize Kanji characters.
-A list of all supported characters can be found [here](./CNN_kanji_only/labels_CNN_kanji_only.txt) and an [desktop application using it here.](https://github.com/CaptainDario/DaKanjiRecognizer-Desktop).
+A list of all supported characters can be found [here](./CNN_kanji_only/labels_CNN_kanji_only.txt) and an [desktop application using it here.](https://github.com/CaptainDario/DaKanji-Desktop).
 <br>
 In the [CNN_kanji](./CNN_kanji) folder you can find the python files necessary to train this model on your own.
 When everything is setup correctly `training.py` can be run to train the network. <br>

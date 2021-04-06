@@ -1,4 +1,4 @@
-# DaKanjiRecognizer-ML
+# DaKanji-ML
 The machine learning parts of the DaKanji applications.
 
 

@@ -19,3 +19,7 @@ releases/
 **.hdf5
 **/model
 /retinanet_kuzushiji/models/**
+
+
+# ignore fonts
+/fonts/**

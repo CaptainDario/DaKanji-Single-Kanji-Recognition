@@ -1,7 +1,9 @@
 
 import multiprocessing as mp
+from typing import List, Tuple
 import numpy as np
 from PIL import Image as PImage
+from PIL import ImageFilter, ImageFont, ImageDraw
 from PIL import ImageFilter
 import random
 import math
@@ -11,8 +13,44 @@ import tensorflow as tf
 
 shared_dict = {}
 
+def generate_images(amount : int, kanji : str, fonts : List[str]):
 
-def distort_sample(img : PImage) -> (PImage, [int], [int]):
+    cnt = 0
+    kanji_labels = np.full(shape=(amount), fill_value=kanji, dtype=str)
+    kanji_imgs = np.zeros(shape=(amount, 64, 64, 1), dtype=np.uint8)
+
+    while amount > cnt:
+        # for every given font
+        for f in fonts:
+
+            if (cnt >= amount):
+                break
+
+            font_size = 50
+            font = ImageFont.truetype(f, font_size)
+                
+            # make sure that the image fits in the 64x64 image
+            if(font.getsize(kanji)[0] > 64):
+                font = ImageFont.truetype(f, font_size - (font.getsize(kanji)[0] - font_size))
+            if(font.getsize(kanji)[1] > 64):
+                font = ImageFont.truetype(f, font_size - (font.getsize(kanji)[1] - font_size))
+
+            # create the image
+            img = PImage.new(mode="L", size=(64, 64), color=0)
+            d = ImageDraw.Draw(img)
+            d.text(((64 - font.getsize(kanji)[0]) // 4, (64 - font.getsize(kanji)[1]) // 4), kanji, font=font, fill=255)     
+
+            # store the image in the array
+            kanji_imgs[cnt] = np.array(img).reshape(64, 64, 1)
+            if(cnt+1 < amount):
+                kanji_imgs[cnt+1] = np.array(distort_sample(img)[0]).reshape(64, 64, 1)
+            
+            cnt += 2
+
+    return kanji_imgs, kanji_labels
+
+
+def distort_sample(img : PImage) -> [PImage, [int], [int]]:
     """
     Distort the given image randomly.
 
@@ -171,7 +209,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         return (self.num_samples // 100 * self.percentage) // self.batch_size
 
     def on_epoch_end(self):
-        if(False):
+        if(self.shuffle):
             rng_state = np.random.get_state()
             np.random.shuffle(x_np)
             np.random.set_state(rng_state)

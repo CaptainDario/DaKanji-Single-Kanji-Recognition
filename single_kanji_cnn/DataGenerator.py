@@ -3,6 +3,7 @@ import PIL
 from PIL import Image as PImage
 from PIL import ImageFilter, ImageFont, ImageDraw
 
+from fontTools.ttLib import TTFont
 from tqdm.auto import tqdm
 
 from typing import Tuple, List
@@ -109,23 +110,16 @@ def generate_images(
         Two numpy arrays.
         One containing all images and the other the matching labels.
     """
-    # make sure the font supports the character
-    #for table in TTFont(f)['cmap'].tables:
-    #    if ord(kanji) in table.cmap.keys():
-    #        includes = True
-    #        break
-    #if(not includes):
-    #   continue
-
 
     cnt = 0
     kanji_labels = np.empty(shape=(sum(amounts)), dtype=str)
     kanji_imgs = np.zeros(shape=(sum(amounts), 64, 64, 1), dtype=np.uint8)
 
-    ttfs = [ImageFont.truetype(f, font_size) for f in fonts]
+    
     with tqdm(total=len(kanjis)) as pbar:
         for kanji_cnt, kanji in enumerate(kanjis):
             already_gen_cnt = sum(amounts[:kanji_cnt])
+            ttfs = [ImageFont.truetype(f, font_size) for f in fonts[kanji_cnt]]
             for cnt in range(0, amounts[kanji_cnt], 2):
 
                 # cycle through the availabl fonts
@@ -151,3 +145,17 @@ def generate_images(
             pbar.update(1)
         
     return kanji_imgs, kanji_labels
+
+def check_font_char_support(fonts : List[str], char : str):
+    """ Check which of the given fonts supports the given char.
+    """
+
+    element = (char, [])
+
+    for font in fonts:
+        for table in TTFont(font)['cmap'].tables:
+            if ord(char) in table.cmap.keys():
+                element[1].append(font)
+                break
+
+    return element

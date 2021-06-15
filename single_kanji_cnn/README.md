@@ -21,7 +21,7 @@ In the releases section pretrained model weights can be found. Also a TensorFlow
 The input should be a *grayscale, 8-bit* image of *any scale*.
 
 **Output:**
-A one-hot-vector containing the class probabilities.
+A one-hot-vector containing the class probabilities (lines up with `labels.txt` and `labels_python_list.txt`).
 
 
 ## Credits

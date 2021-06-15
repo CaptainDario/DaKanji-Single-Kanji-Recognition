@@ -146,9 +146,17 @@ def check_font_char_support(fonts : List[str], char : str):
     element = (char, [])
 
     for font in fonts:
+        f = ImageFont.truetype(font, 64)
         for table in TTFont(font)['cmap'].tables:
             if ord(char) in table.cmap.keys():
-                element[1].append(font)
+                # create an image and draw the character
+                img = PImage.new(mode="L", size=(64, 64), color=0)
+                d = ImageDraw.Draw(img)
+                d.text((0, 0), char, font=f, fill=255)
+                img = np.array(img).reshape(64, 64, 1)    
+
+                if(np.any(img)):
+                    element[1].append(font)
                 break
 
     return element

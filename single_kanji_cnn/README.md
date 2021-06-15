@@ -18,7 +18,7 @@ Those have to be stored in [the fonts folder](./fonts).
 In the releases section pretrained model weights can be found. Also a TensorFlow lite model is available.<br/>
 
 **Input:**
-The input should be a grayscale image of any scale.
+The input should be a *grayscale, 8-bit* image of *any scale*.
 
 **Output:**
 A one-hot-vector containing the class probabilities.

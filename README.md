@@ -15,5 +15,6 @@ install all dependencies:
 python -m pip install wheel
 python -m pip install -r requirements.txt
 ```
-
+Now you should follow model specific setup steps.
+For this look at the README for the model you are interested in.
 

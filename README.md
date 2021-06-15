@@ -1,11 +1,13 @@
 # DaKanji-ML
-The "brain" of DaKanji.
 This repository contains all machine learning models used in DaKanji. <br/>
 For every model there is a separate folder.
 
-| folder name | description |
-| ----------- | ----------- |
+|      folder name |                     description                     |
+| :--------------: | :-------------------------------------------------: |
 | single_kanji_cnn | CNN which can detect single hand written characters |
+
+If you are interested in using one of the models go to their folder.
+Every folder has more details on the model itself.
 
 ## Setup development environment
 install all dependencies:

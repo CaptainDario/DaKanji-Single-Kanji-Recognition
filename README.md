@@ -13,8 +13,6 @@ Every folder has more details on the model itself.
 install all dependencies:
 ```
 python -m pip install wheel
-```
-```
 python -m pip install -r requirements.txt
 ```
 

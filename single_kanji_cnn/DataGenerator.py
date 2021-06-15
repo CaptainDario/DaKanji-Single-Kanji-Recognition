@@ -46,24 +46,7 @@ def distort_sample(img : PImage) -> Tuple[PIL.Image.Image, Tuple[int, int], Tupl
         x_shear = random.uniform(-0.2, 0.2)
         img = img.transform(img.size, PImage.AFFINE, (1, x_shear, 0, y_shear, 1, 0))
 
-    
-    # scale and translate image
-    #scale the image
-    #size_x = random.randrange(25, 63)
-    #size_y = random.randrange(25, 63)
-    #scale = (size_x, size_y)
-    #offset = (math.ceil((64 - size_x) / 2), math.ceil((64 - size_y) / 2))
-    #img = img.resize(scale)
-
-    # put it again on a black background (translated)
-    #background = PImage.new('L', (64, 64))
-    #trans_x = random.randrange(0, math.floor((64 - size_x)))
-    #trans_y = random.randrange(0, math.floor((64 - size_y)))
-    #offset = (trans_x, trans_y)
-    #background.paste(img, offset)
-    #img = background
-    
-    # sine transform and adding noise
+    # sine transform
     t_img = np.array(img)
     
     A = t_img.shape[0] / random.uniform(3.0, 6.0)

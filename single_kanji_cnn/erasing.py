@@ -3,7 +3,7 @@ import numpy as np
 
 
 
-def random_erasing(img : np.ndarray, probability : float = 0.5, sl: float = 0.02, sh: float = 0.4, r1: float = 0.3, method : str = 'random') -> tf.Tensor:
+def random_erasing(img : np.ndarray) -> tf.Tensor:
     #Motivated by https://github.com/Amitayus/Random-Erasing-TensorFlow.git
     #Motivated by https://github.com/zhunzhong07/Random-Erasing/blob/master/transforms.py
     '''
@@ -23,7 +23,11 @@ def random_erasing(img : np.ndarray, probability : float = 0.5, sl: float = 0.02
         The augmented image. 
     '''
     
-    assert method in ['random', 'white', 'black'], 'Wrong method parameter'
+    probability : float = 0.5
+    sl: float = 0.02
+    sh: float = 0.4
+    r1: float = 0.3
+    method : str = 'black'
 
     
     if tf.random.uniform([]) > probability:
@@ -56,11 +60,11 @@ def random_erasing(img : np.ndarray, probability : float = 0.5, sl: float = 0.02
     part2 = tf.slice(img, [x1,0,0], [h,y1,img_channels]) # second row 1
 
     if method == 'black':
-        part3 = tf.zeros((h,w,img_channels)) # second row 2
+        part3 = tf.zeros((h,w,img_channels), dtype=tf.float16) # second row 2
     elif method == 'white':
-        part3 = tf.ones((h,w,img_channels))
+        part3 = tf.ones((h,w,img_channels), dtype=tf.float16)
     elif method == 'random':
-        part3 = tf.random.uniform((h,w,img_channels))
+        part3 = tf.random.uniform((h,w,img_channels), dtype=tf.float16)
     
     part4 = tf.slice(img,[x1,y1+w,0], [h,img_width-y1-w,img_channels]) # second row 3
     part5 = tf.slice(img,[x1+h,0,0], [img_height-x1-h,img_width,img_channels]) # third row

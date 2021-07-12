@@ -23,10 +23,10 @@ def random_erasing(img : np.ndarray) -> tf.Tensor:
         The augmented image. 
     '''
     
-    probability : float = 0.35
+    probability : float = 0.5
     sl: float = 0.02
     sh: float = 0.4
-    r1: float = 0.2
+    r1: float = 0.3
     method : str = 'black'
 
     

@@ -1,4 +1,12 @@
+import time
+import os
+
 from xml.etree import ElementTree as ET
+
+import drawSvg as draw
+from svgpathtools import parse_path, disvg
+import svgpathtools
+from svgpathtools.svg_to_paths import svg2paths
 
 
 
@@ -33,8 +41,18 @@ def kanjivg_xml_to_image(tag, strokes):
 		strokes.append(tag.attrib['d'])
 
 
-def strokes_to_image(strokes):
-	pass
+def strokes_to_svg(strokes):
+	d = draw.Drawing(107, 107, origin='center', displayInline=False)
+
+	segments = []
+	for cnt, stroke in enumerate(strokes):
+		sub_segments = parse_path(stroke)
+		segments.extend(sub_segments._segments)
+		
+	svg = svgpathtools.Path(*segments)
+	svgpathtools.disvg(svg)
+
+	print("test")
 
 if __name__ == "__main__":
 
@@ -54,9 +72,14 @@ if __name__ == "__main__":
 
 		hex = child.attrib['id'].removeprefix("kvg:kanji_")
 		kanji = chr(int(hex, 16))
-		if(kanji == '晰'):
+		if(kanji == "わ"):
+			# get the strokes from the database
 			strokes = []
 			kanjivg_xml_to_image(child[0], strokes)
-			print(strokes)
+
+			# draw the char on an image
+			strokes_to_svg(strokes)
+
+		cnt += 1
 
 	print(cnt)

@@ -1,56 +1,18 @@
-
-import multiprocessing as mp
-from typing import List, Tuple
 import numpy as np
+import PIL
 from PIL import Image as PImage
 from PIL import ImageFilter, ImageFont, ImageDraw
-from PIL import ImageFilter
-import random
-import math
+import cv2
 import tensorflow as tf
 
+from fontTools.ttLib import TTFont
+
+from typing import Tuple, List
+import random
 
 
-shared_dict = {}
 
-def generate_images(amount : int, kanji : str, fonts : List[str]):
-
-    cnt = 0
-    kanji_labels = np.full(shape=(amount), fill_value=kanji, dtype=str)
-    kanji_imgs = np.zeros(shape=(amount, 64, 64, 1), dtype=np.uint8)
-
-    while amount > cnt:
-        # for every given font
-        for f in fonts:
-
-            if (cnt >= amount):
-                break
-
-            font_size = 50
-            font = ImageFont.truetype(f, font_size)
-                
-            # make sure that the image fits in the 64x64 image
-            if(font.getsize(kanji)[0] > 64):
-                font = ImageFont.truetype(f, font_size - (font.getsize(kanji)[0] - font_size))
-            if(font.getsize(kanji)[1] > 64):
-                font = ImageFont.truetype(f, font_size - (font.getsize(kanji)[1] - font_size))
-
-            # create the image
-            img = PImage.new(mode="L", size=(64, 64), color=0)
-            d = ImageDraw.Draw(img)
-            d.text(((64 - font.getsize(kanji)[0]) // 4, (64 - font.getsize(kanji)[1]) // 4), kanji, font=font, fill=255)     
-
-            # store the image in the array
-            kanji_imgs[cnt] = np.array(img).reshape(64, 64, 1)
-            if(cnt+1 < amount):
-                kanji_imgs[cnt+1] = np.array(distort_sample(img)[0]).reshape(64, 64, 1)
-            
-            cnt += 2
-
-    return kanji_imgs, kanji_labels
-
-
-def distort_sample(img : PImage) -> [PImage, [int], [int]]:
+def distort_sample(img : PImage) -> Tuple[PIL.Image.Image, Tuple[int, int], Tuple[int, int]]:
     """
     Distort the given image randomly.
 
@@ -59,57 +21,51 @@ def distort_sample(img : PImage) -> [PImage, [int], [int]]:
     Randomly applies the filter:
         sharpen, blur, smooth
 
-    Returns the distorted image.
+    Args:
+        img: the image which should be distorted.
+
+    Returns:
+        the distorted image
+        the offset where the character is placed in the image
+        the size of the character
     """
 
     offset, scale = (0, 0), (64, 64)
 
-    t = random.choice(["sine", "rotate", "shear", "scale"])
+    t = random.choice(["rotate", "shear", "erode", "dilate"])
     f = random.choice(["blur", "sharpen", "smooth"])
 
     # randomly apply transformations...
     # rotate image
     if("rotate" in t):
-        img = img.rotate(random.uniform(-15, 15))
+        img = img.rotate(random.uniform(-10, 10))
     
     # shear image
     if("shear" in t):
         y_shear = random.uniform(-0.2, 0.2)
         x_shear = random.uniform(-0.2, 0.2)
         img = img.transform(img.size, PImage.AFFINE, (1, x_shear, 0, y_shear, 1, 0))
+
+    # sine transform
+    t_img = np.array(img)
     
-    # scale and translate image
-    if("scale" in t):
-        #scale the image
-        size_x = random.randrange(25, 63)
-        size_y = random.randrange(25, 63)
-        scale = (size_x, size_y)
-        offset = (math.ceil((64 - size_x) / 2), math.ceil((64 - size_y) / 2))
-        img = img.resize(scale)
+    A = t_img.shape[0] / random.uniform(3.0, 6.0)
+    w = 2.0 / t_img.shape[1]
 
-        # put it again on a black background (translated)
-        background = PImage.new('L', (64, 64))
-        trans_x = random.randrange(0, math.floor((64 - size_x)))
-        trans_y = random.randrange(0, math.floor((64 - size_y)))
-        offset = (trans_x, trans_y)
-        background.paste(img, offset)
-        img = background
+    shift_factor = random.choice([-1, 1]) * random.uniform(0.10, 0.2)
+    shift = lambda x: shift_factor * A * np.sin(-2*np.pi*x * w)
+
+    for i in range(t_img.shape[0]):
+        t_img[:,i] = np.roll(t_img[:,i], int(shift(i)))
     
-    if("sine" in t):
-        t_img = np.array(img)
+    if("erode" in t):
+        t_img = cv2.erode(t_img, np.ones((2, 2), np.uint8), iterations=1)
+    if("dilate" in t):
+        t_img = cv2.dilate(t_img, np.ones((3, 3), np.uint8), iterations=1)
+    
+    img = PImage.fromarray(t_img, mode="L")
 
-        A = t_img.shape[0] / 3.0
-        w = 2.0 / t_img.shape[1]
-
-        shift_factor = random.choice([-1, 1]) * random.uniform(0.15, 0.2)
-        shift = lambda x: shift_factor * A * np.sin(-2*np.pi*x * w)
-
-        for i in range(t_img.shape[0]):
-            t_img[:,i] = np.roll(t_img[:,i], int(shift(i)))
-
-        img = PImage.fromarray(t_img)
-
-
+    # FILTER
     # blur
     if("blur" in f):
         img = img.filter(ImageFilter.GaussianBlur(radius=random.uniform(0.5, 1.2)))
@@ -124,121 +80,83 @@ def distort_sample(img : PImage) -> [PImage, [int], [int]]:
 
     return img, offset, scale
 
-def generator_func(start_index, end_index, x_shape, y_shape):
-    X, Y = [], []
+
+def generate_images(
+    amounts : List[int], kanjis : List[str], 
+    fonts : List[List[str]], font_size : int = 50) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Generates `amount` images of the given `kanji` using given `fonts`
+    while augmenting 50% of them randomly. 
+
+    Args:
+        amount    : how many samples should be created per kanji.
+        kanji     : the (kanji) character which should be created
+        fonts     : a list of paths to fonts which should be used 
+                    to created images.
+
+    Returns:
+        Two numpy arrays.
+        One containing all images and the other the matching labels.
+    """
+
+    cnt = 0
+    kanji_labels = np.empty(shape=(sum(amounts)), dtype=str)
+    kanji_imgs = np.zeros(shape=(sum(amounts), 64, 64, 1), dtype=np.uint8)
+
     
-    x_loc = np.frombuffer(shared_dict["x"], dtype="float16").reshape(x_shape)
-    y_loc = np.frombuffer(shared_dict["y"], dtype="b").reshape(y_shape)
-    
-    for i in range(start_index, end_index):
-        base_img = x_loc[i]
-        img = PImage.fromarray(np.uint8(base_img.reshape(64, 64) * 255))
-        img, *unused = distort_sample(img)
+    for kanji_cnt, kanji in enumerate(kanjis):
+        already_gen_cnt = sum(amounts[:kanji_cnt])
+        ttfs = [ImageFont.truetype(f, font_size) for f in fonts[kanji_cnt]]
 
-        # add transformed image
-        X.append(np.array(img).reshape(64, 64, 1))
-        Y.append(y_loc[i])
-        X.append(np.array(img).reshape(64, 64, 1))
-        Y.append(y_loc[i])
+        # generate one image per font
+        for cnt, font in enumerate(ttfs):
 
-        # add base image
-        #X.append(base_img)
-        #Y.append(y_loc[i])
+            if(cnt >= amounts[kanji_cnt]):
+                break
+
+            # make sure that the image fits in the 64x64 image
+            if(font.getsize(kanji)[0] > 64):
+                font = font.font_variant(size = font_size - (font.getsize(kanji)[0] - font_size))
+            if(font.getsize(kanji)[1] > 64):
+                font = font.font_variant(size = font_size - (font.getsize(kanji)[1] - font_size))
+
+            # create the image
+            img = PImage.new(mode="L", size=(64, 64), color=0)
+            d = ImageDraw.Draw(img)
+            d.text(((64 - font.getsize(kanji)[0]) // 4, (64 - font.getsize(kanji)[1]) // 4), kanji, font=font, fill=255)     
+
+            # store the image / label in the array
+            kanji_imgs[cnt + already_gen_cnt] = np.array(img).reshape(64, 64, 1)
+            kanji_labels[cnt + already_gen_cnt] = kanji
         
-    return X, Y
-
-def generator_initializer(_x_shared, _y_shared):
-    shared_dict["x"] = _x_shared
-    shared_dict["y"] = _y_shared
-
-def generator_func(start_index, end_index, x_shape, y_shape):
-    X, Y = [], []
-    
-    x_loc = np.frombuffer(shared_dict["x"], dtype="float16").reshape(x_shape)
-    y_loc = np.frombuffer(shared_dict["y"], dtype="b").reshape(y_shape)
-    
-    for i in range(start_index, end_index):
-        base_img = x_loc[i]
-        img = PImage.fromarray(np.uint8(base_img.reshape(64, 64) * 255))
-        img, *unused = distort_sample(img)
-
-        # add transformed image
-        X.append(np.array(img).reshape(64, 64, 1))
-        Y.append(y_loc[i])
-        X.append(np.array(img).reshape(64, 64, 1))
-        Y.append(y_loc[i])
-
-        # add base image
-        #X.append(base_img)
-        #Y.append(y_loc[i])
+        # append distorted versions of the images created from the fonts
+        cnt += 1
+        while(cnt < amounts[kanji_cnt]):
+            p_img = tf.keras.preprocessing.image.array_to_img(kanji_imgs[(cnt) % len(ttfs) + already_gen_cnt])
+            kanji_imgs[cnt+already_gen_cnt]   = np.array(distort_sample(p_img)[0]).reshape(64, 64, 1)
+            kanji_labels[cnt+already_gen_cnt] = kanji
+            cnt += 1
         
-    return X, Y
+    return kanji_imgs, kanji_labels
 
-class DataGenerator(tf.keras.utils.Sequence):
+def check_font_char_support(fonts : List[str], char : str):
+    """ Check which of the given fonts supports the given char.
+    """
 
-    def __init__(self, num_samples, batch_size,
-                        percentage, mode,
-                        x_shared, y_shared,
-                        x_np_shape, y_np_shape,
-                        processes, shuffle=True):
-        self.num_samples = num_samples
-        # 50% original images + 50% augmented images 
-        self.batch_size = batch_size // 2
-        self.percentage = percentage
+    element = (char, [])
 
-        # an offset to devide the data set into test and train
-        self.start_index = 0
-        if(mode == "testing"):
-            self.start_index = num_samples - (num_samples // 100 * percentage)
-        # is this a train or a test generator
-        self.mode = mode
-        # how many processes should be used for this generator
-        self.processes = processes
-        # should the arrays be shuffled after each epoch
-        self.shuffle = shuffle
+    for font in fonts:
+        f = ImageFont.truetype(font, 64)
+        for table in TTFont(font)['cmap'].tables:
+            if ord(char) in table.cmap.keys():
+                # create an image and draw the character
+                img = PImage.new(mode="L", size=(64, 64), color=0)
+                d = ImageDraw.Draw(img)
+                d.text((0, 0), char, font=f, fill=255)
+                img = np.array(img).reshape(64, 64, 1)    
 
-        self.x_np_shape = x_np_shape
-        self.y_np_shape = y_np_shape
-        
-        # a pool of processes for generating augmented data
-        self.pool = mp.Pool(processes=self.processes,
-            initializer=generator_initializer,
-            initargs=(x_shared, y_shared))
-        
-    def __len__(self):
-        return (self.num_samples // 100 * self.percentage) // self.batch_size
+                if(np.any(img)):
+                    element[1].append(font)
+                break
 
-    def on_epoch_end(self):
-        if(self.shuffle):
-            rng_state = np.random.get_state()
-            np.random.shuffle(x_np)
-            np.random.set_state(rng_state)
-            np.random.shuffle(y_np)
-            
-    def __getitem__(self, index):
-
-        arguments = []
-        slice_size = self.batch_size // self.processes
-        current_batch = index * self.batch_size
-        for i in range(self.processes):
-            slice_start = self.start_index + (current_batch + i * slice_size)
-            slice_end = self.start_index + (current_batch + (i+1) * slice_size)
-            arguments.append([slice_start, slice_end, self.x_np_shape, self.y_np_shape])
-        
-        return_values = self.pool.starmap(generator_func, arguments)
-
-        X, Y = [], []
-        for imgs, labels in return_values:
-            X.append(imgs)
-            Y.append(labels)
-
-        return np.concatenate(X).astype(np.float16), np.concatenate(Y).astype(np.float16)
-
-
-
-
-
-
-
-
-
+    return element

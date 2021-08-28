@@ -17,4 +17,12 @@ releases/
 
 # ignore the models
 **.hdf5
-**\model
+**/model
+/retinanet_kuzushiji/models/**
+
+
+# ignore fonts
+/fonts/**
+single_kanji_cnn/supported_fonts_1.txt
+single_kanji_cnn/supported_fonts_2.txt
+disvg_output.svg

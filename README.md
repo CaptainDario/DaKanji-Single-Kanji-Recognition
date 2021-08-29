@@ -1,7 +1,12 @@
-# DaKanji Single Kanji CNN
+# DaKanji Single Kanji Recognition
 
 This CNN can recognize a single character (Kanji, Hiragana, Katakana).
 A list of all supported characters can be found [here](./labels.txt).
+
+## Apps which use this model:
+| name | android | iOS |
+|:---:|:---:|:---:|
+| DaKanji| x | x |
 
 ## Training
 
@@ -13,7 +18,7 @@ The training can than be done with the [single_kanji_cnn_training notebook](sing
 In the releases section pretrained model weights can be found. Also a TensorFlow lite model is available.
 
 **Input:**
-The input should be a *grayscale, 8-bit* image of *any scale*.
+The input should be a *grayscale* image of *any size*.
 
 **Output:**
 A one-hot-vector containing the class probabilities (lines up with `labels.txt`).
@@ -29,6 +34,14 @@ python -m pip install -r requirements.txt
 
 Now you should follow model specific setup steps.
 For this look at the README for the model you are interested in.
+
+## Usage in your software
+
+I put lots of effort and time into developing this model and hope that it can be used in many apps.
+If you decide to use this machine learning model please give me credit like:
+`Character recognition powered by machine learning from CaptainDario (DaAppLab)`
+It would also be nice if you open an issue and tell me that you are using this model.
+Than I would add your software to the [test](#App-which-use-this-model)
 
 ## Credits
 

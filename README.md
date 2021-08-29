@@ -3,7 +3,7 @@
 This CNN can recognize a single character (Kanji, Hiragana, Katakana).
 A list of all supported characters can be found [here](./labels.txt).
 
-## Apps which use this model:
+## Apps which use this model
 
 | name | android | iOS | Linux | MacOS | Windows | Web |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|

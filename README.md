@@ -7,7 +7,7 @@ A list of all supported characters can be found [here](./labels.txt).
 
 | name | android | iOS | Linux | MacOS | Windows | Web |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| DaKanji | ✅ |   | ✅ | ✅ | ✅ |   |
+| DaKanji | ✅ | ✅ | ✅ | ✅ | ✅ |   |
 | Kanji Graph | ✅ |   |   |   |   |   |
 
 ## Training

@@ -47,9 +47,7 @@ Than I would add your software to the [test](#apps-which-use-this-model)
 
 ## Credits
 
-The data on which the neural network was trained on was kindly provided by [ETL Character Database](http://etlcdb.db.aist.go.jp/obtaining-etl-character-database)
-
-[The KanjiVG dataset](https://kanjivg.tagaini.net/) was used to generate "handwritten" kanjis
+The data on which the neural network was trained on was kindly provided by [ETL Character Database](http://etlcdb.db.aist.go.jp/obtaining-etl-character-database) and [The KanjiVG dataset](https://kanjivg.tagaini.net/).
 Papers:
 
 * [EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks](https://arxiv.org/abs/1905.11946)

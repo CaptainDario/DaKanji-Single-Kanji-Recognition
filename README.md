@@ -43,7 +43,7 @@ I put lots of effort and time into developing this model and hope that it can be
 If you decide to use this machine learning model please give me credit like:
 `Character recognition powered by machine learning from CaptainDario (DaAppLab)`
 It would also be nice if you open an issue and tell me that you are using this model.
-Than I would add your software to the [test](#apps-which-use-this-model)
+Than I would add your software to the [apps section](#apps-which-use-this-model)
 
 ## Credits
 

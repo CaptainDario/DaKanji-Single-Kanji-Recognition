@@ -3,13 +3,6 @@
 This CNN can recognize a single character (Kanji, Hiragana, Katakana).
 A list of all supported characters can be found [here](./labels.txt).
 
-## Apps which use this model
-
-| name | android | iOS | Linux | MacOS | Windows | Web |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| DaKanji | ✅ | ✅ | ✅ | ✅ | ✅ |   |
-| Kanji Graph | ✅ |   |   |   |   |   |
-
 ## Training
 
 To generate the data necessary to train this CNN, the [single_kanji_data_gen notebook](single_kanji_data_gen.ipynb) is used.
@@ -17,7 +10,7 @@ The training can then be done with the [single_kanji_cnn_training notebook](sing
 
 ## Inference
 
-In the releases section pretrained model weights can be found. Also a TensorFlow lite model is available.
+In the releases section, pretrained model weights can be found. Also, a TensorFlow lite model is available.
 
 **Input:**
 The input should be a *grayscale* image of *any size*.
@@ -34,8 +27,12 @@ python -m pip install wheel
 python -m pip install -r requirements.txt
 ```
 
-Now you should follow model specific setup steps.
-For this look at the README for the model you are interested in.
+## Apps that use this model
+
+| name | android | iOS | Linux | MacOS | Windows | Web |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| DaKanji | ✅ | ✅ | ✅ | ✅ | ✅ |   |
+| Kanji Graph | ✅ |   |   |   |   |   |
 
 ## Usage in your software
 

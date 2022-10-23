@@ -13,7 +13,7 @@ A list of all supported characters can be found [here](./labels.txt).
 ## Training
 
 To generate the data necessary to train this CNN, the [single_kanji_data_gen notebook](single_kanji_data_gen.ipynb) is used.
-The training can than be done with the [single_kanji_cnn_training notebook](single_kanji_cnn_training.ipynb).
+The training can then be done with the [single_kanji_cnn_training notebook](single_kanji_cnn_training.ipynb).
 
 ## Inference
 

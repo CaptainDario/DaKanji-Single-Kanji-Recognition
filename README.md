@@ -42,6 +42,8 @@ If you decide to use this machine learning model please give me credit like:
 It would also be nice if you open an issue and tell me that you are using this model.
 Than I would add your software to the [apps section](#apps-which-use-this-model)
 
+[Here](https://github.com/CaptainDario/DaKanji-Single-Kanji-Recognition/wiki#usage-in-different-languages) you can find some examples how to use this model in different languages. If you use this model in a other language, please open an issue and let me know, I will add it to the wiki.
+
 ## Credits
 
 The data on which the neural network was trained on was kindly provided by [ETL Character Database](http://etlcdb.db.aist.go.jp/obtaining-etl-character-database) and [The KanjiVG dataset](https://kanjivg.tagaini.net/).

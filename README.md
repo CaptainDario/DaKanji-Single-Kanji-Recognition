@@ -3,6 +3,10 @@
 This CNN can recognize a single character (Kanji, Hiragana, Katakana).
 A list of all supported characters can be found [here](./labels.txt).
 
+Sneak peak of the network in action
+
+<img src="https://user-images.githubusercontent.com/51273483/233300113-502930e9-dcac-4f54-b522-9e186906da14.gif" style="display:block;margin-left:auto;margin-right:auto;" width="25%"/>
+
 ## Training
 
 To generate the data necessary to train this CNN, the [single_kanji_data_gen notebook](single_kanji_data_gen.ipynb) is used.
